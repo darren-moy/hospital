@@ -3,3 +3,6 @@ __pycache__/
 .vscode/
 .env
 *.db
+*.db-journal
+*.db-wal
+*.db-shm
