@@ -21,3 +21,25 @@ CREATE TABLE IF NOT EXISTS allergies (
     recorded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (patient_id, substance)                          -- same allergy can't be listed for same patient 
 );
+
+CREATE TABLE IF NOT EXISTS encounters (
+    id                  INTEGER PRIMARY KEY,
+    patient_id          INTEGER NOT NULL 
+                        REFERENCES patients(id) ON DELETE RESTRICT,
+    encounter_type      TEXT NOT NULL 
+                        CHECK(encounter_type IN ('outpatient', 'inpatient', 'emergency')),
+    reason              TEXT NOT NULL 
+                        CHECK(length(reason) BETWEEN 1 AND 200),
+    status              TEXT NOT NULL DEFAULT 'open'
+                        CHECK(status in ('open', 'closed')),
+    started_at          TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ended_at            TEXT,
+    CHECK (
+        (status = 'open' AND ended_at IS NULL)
+        OR (status = 'closed' AND ended_at IS NOT NULL)),
+    CHECK (ended_at IS NULL OR ended_at >= started_at)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS one_open_encounter_per_patient
+    ON encounters (patient_id)
+    WHERE status = 'open';

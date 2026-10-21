@@ -5,6 +5,15 @@ VALID_SEX = {"F", "M", "O", "U"}
 MAX_NAME_LENGTH = 50 
 FIRST_MRN = 100001
 
+def _get_patient_id(conn, mrn):
+    row = conn.execute(
+        "SELECT id FROM patients WHERE mrn = ?",
+        [mrn.strip()],
+    ).fetchone()
+    if row is None:
+        raise ValueError(f"No patient with MRN {mrn}.")
+    return row["id"]
+
 def _clean_name(value, field):
     if not isinstance(value, str):
         raise ValueError(f"{field} must be text.")

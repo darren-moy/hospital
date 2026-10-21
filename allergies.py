@@ -1,19 +1,11 @@
 import sqlite3
-
 from db import get_connection
+from patients import _get_patient_id
 
 VALID_SEVERITIY = {"mild", "moderate", "severe"}
 MAX_SUBSTANCE_LENGTH = 100 
 MAX_REACTION_LENGTH = 200 
 
-def _get_patient_id(conn, mrn):
-    row = conn.execute(
-        "SELECT id FROM patients WHERE mrn = ?",
-        [mrn.strip()],
-    ).fetchone()
-    if row is None:
-        raise ValueError(f"No patient with MRN {mrn}.")
-    return row["id"]
 
 def add_allergy(mrn, substance, severity, reaction=None):
     substance = substance.strip()
