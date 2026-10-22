@@ -43,3 +43,19 @@ CREATE TABLE IF NOT EXISTS encounters (
 CREATE UNIQUE INDEX IF NOT EXISTS one_open_encounter_per_patient
     ON encounters (patient_id)
     WHERE status = 'open';
+
+CREATE TABLE IF NOT EXISTS vitals (
+    id                  INTEGER PRIMARY KEY,
+    encounter_id        INTEGER NOT NULL
+                        REFERENCES encounters(id) ON DELETE RESTRICT,
+    systolic            INTEGER CHECK (systolic BETWEEN 50 AND 300),
+    diastolic           INTEGER CHECK (diastolic BETWEEN 20 AND 200),
+    heart_rate          INTEGER CHECK (heart_rate BETWEEN 20 AND 300),
+    temperature_f       REAL    CHECK (temperature_f BETWEEN 85 AND 115),
+    resp_rate           INTEGER CHECK (resp_rate BETWEEN 4 AND 80),
+    spo2                INTEGER CHECK (spo2 BETWEEN 50 AND 100),
+    recorded_at         TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CHECK ((systolic IS NULL) = (diastolic IS NULL))
+    CHECK (systolic IS NULL OR systolic > diastolic),
+    CHECK (COALESCE(systolic, heart_rate, temperature_f, resp_rate, spo2) IS NOT NULL)
+) STRICT;

@@ -57,7 +57,7 @@ def register_patient(first_name, last_name, date_of_birth, sex):
         mrn = _next_mrn(conn)
         conn.execute(
             "INSERT INTO patients (mrn, first_name, last_name, date_of_birth, sex)"
-            "VALUES (?, ?, ?, ?, ?)"
+            "VALUES (?, ?, ?, ?, ?)",
             [mrn, first_name, last_name, date_of_birth, sex],
         )
     return mrn 
@@ -83,7 +83,7 @@ def search_by_last_name(text):
 
     with get_connection() as conn:
         rows = conn.execute(
-            "SELECT * FROM patients"
+            "SELECT * FROM patients "
             "WHERE last_name LIKE ? ESCAPE '\\' "
             "ORDER BY last_name, first_name",
             [pattern],
