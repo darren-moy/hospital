@@ -61,21 +61,25 @@ CREATE TABLE IF NOT EXISTS vitals (
 ) STRICT;
 
 CREATE TABLE IF NOT EXISTS conditions (
-    id              INTEGER PRIMARY KEY,
-    patient_id      INTEGER NOT NULL 
-                    REFERENCES patients(id) ON DELETE RESTRICT,
-    icd10_code      TEXT NOT NULL       
-                    CHECK(icd10_code = upper(icd10_code) AND length(icd10_code) BETWEEN 3 AND 8),
-    description     TEXT NOT NULL 
-                    CHECK (length(description) BETWEEN 1 AND 200),
-    status          TEXT NOT NULL DEFAULT 'active'
-                    CHECK ( status in ('active', 'resolved')),
-    onset_date      TEXT CHECK (onset_date is NULL OR date(onset_date) = onset_date),
-    resolved_date   TEXT CHECK (resolved_date IS NULL OR date(resolved_date) = resolved_date),
-    recorded_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CHECK (
-        (status = 'active' AND resolved_date IS NULL )
-        OR (status = 'resolved' AND resolved_date IS NOT NULL )
+    id                  INTEGER PRIMARY KEY,
+    patient_id          INTEGER NOT NULL 
+                        REFERENCES patients(id) ON DELETE RESTRICT,
+    icd10_code          TEXT NOT NULL 
+                        CHECK (
+                            length(icd10_code) BETWEEN 3 AND 8
+                            AND icd10_code GLOB '[A-Z][0-9][0-9A-Z]*'
+                            AND icd10_code NOT GLOB '*[^A-Z0-9.]*'
+                        ),
+    description         TEXT NOT NULL 
+                        CHECK (length(description) BETWEEN 1 AND 200),
+    status              TEXT NOT NULL DEFAULT 'active'
+                        CHECK (status IN ('active', 'resolved')),
+    onset_date          TEXT CHECK (onset_date IS NULL OR date(onset_date) = onset_date),
+    resolved_date       TEXT CHECK (resolved_date IS NULL OR date(resolved_date) = resolved_date),
+    recorded_at         TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CHECK(
+        (status = 'active' AND resolved_date IS NULL)
+        OR (status = 'resolved' AND resolved_date IS NOT NULL)
     ),
     CHECK (onset_date IS NULL OR resolved_date IS NULL OR resolved_date >= onset_date)
 ) STRICT;
