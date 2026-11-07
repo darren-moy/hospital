@@ -6,7 +6,9 @@ from db import get_connection
 from patients import _get_patient_id
 
 ICD10_PATTERN = re.compile(r"[A-Z][0-9][0-9A-Z](\.[0-9A-Z]{1,4})?")
+DATE_PATTERN = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 MAX_DESCRIPTION_LENGTH = 200
+MAX_SQLITE_INT = 2**63 - 1
 
 
 def _clean_code(code):
@@ -22,6 +24,8 @@ def _clean_description(text):
     if not isinstance(text, str):
         raise ValueError("Description must be text.")
     text = text.strip()
+    if "\x00" in text:
+        raise ValueError("Description can't contain hidden NUL characters.")
     if not 1 <= len(text) <= MAX_DESCRIPTION_LENGTH:
         raise ValueError(f"Description must be 1 to {MAX_DESCRIPTION_LENGTH} characters.")
     return text
@@ -30,9 +34,12 @@ def _clean_description(text):
 def _clean_date(value, field):
     if value is None:
         return None
+    # fromisoformat also accepts forms like 20200101 on Python 3.11+, so check the shape first
+    if not isinstance(value, str) or not DATE_PATTERN.fullmatch(value.strip()):
+        raise ValueError(f"{field} must be a real date in YYYY-MM-DD format.")
     try:
         parsed = date.fromisoformat(value.strip())
-    except (ValueError, AttributeError):
+    except ValueError:
         raise ValueError(f"{field} must be a real date in YYYY-MM-DD format.")
     if parsed > date.today():
         raise ValueError(f"{field} can't be in the future.")
@@ -52,13 +59,15 @@ def add_condition(mrn, icd10_code, description, onset_date=None):
                 "VALUES (?, ?, ?, ?)",
                 [patient_id, icd10_code, description, onset_date],
             )
-        except sqlite3.IntegrityError:
-            raise ValueError(f"{icd10_code} is already an active problem for this patient.")
+        except sqlite3.IntegrityError as e:
+            if "UNIQUE" in str(e):
+                raise ValueError(f"{icd10_code} is already an active problem for this patient.")
+            raise ValueError("Condition could not be saved because a value is invalid.")
         return cursor.lastrowid
 
 
 def resolve_condition(condition_id, resolved_date=None):
-    if isinstance(condition_id, bool) or not isinstance(condition_id, int) or condition_id < 1:
+    if isinstance(condition_id, bool) or not isinstance(condition_id, int) or not 1 <= condition_id <= MAX_SQLITE_INT:
         raise ValueError("Condition id must be a positive whole number.")
     resolved_date = _clean_date(resolved_date, "Resolved date") or date.today().isoformat()
 

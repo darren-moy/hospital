@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS patients (
     mrn           TEXT NOT NULL UNIQUE,
     first_name    TEXT NOT NULL CHECK (length(first_name) BETWEEN 1 AND 50),
     last_name     TEXT NOT NULL CHECK (length(last_name) BETWEEN 1 AND 50),
-    date_of_birth TEXT NOT NULL CHECK (date(date_of_birth) = date_of_birth),
+    date_of_birth TEXT NOT NULL CHECK (date(date_of_birth) IS date_of_birth),
     sex           TEXT NOT NULL CHECK (sex IN ('F', 'M', 'O', 'U')),
     created_at    TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -74,8 +74,8 @@ CREATE TABLE IF NOT EXISTS conditions (
                         CHECK (length(description) BETWEEN 1 AND 200),
     status              TEXT NOT NULL DEFAULT 'active'
                         CHECK (status IN ('active', 'resolved')),
-    onset_date          TEXT CHECK (onset_date IS NULL OR date(onset_date) = onset_date),
-    resolved_date       TEXT CHECK (resolved_date IS NULL OR date(resolved_date) = resolved_date),
+    onset_date          TEXT CHECK (onset_date IS NULL OR date(onset_date) IS onset_date),
+    resolved_date       TEXT CHECK (resolved_date IS NULL OR date(resolved_date) IS resolved_date),
     recorded_at         TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CHECK(
         (status = 'active' AND resolved_date IS NULL)
