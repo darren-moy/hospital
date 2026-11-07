@@ -10,7 +10,8 @@ You write pytest tests for a small Python + SQLite patient-records backend. Read
 
 - Generated tests live in `tests/schema/`; create the folder if it doesn't exist. Only create or edit files there, plus the shared `tests/conftest.py`. Leave any other files under `tests/` alone — those are hand-written. Never modify `schema.sql`, `db.py`, or any domain module. If a test exposes a bug, leave the test failing and report it.
 - Never touch the real `hospital.db`. Every test must run against a temporary database via the fixture below.
-- If pytest is missing, install it into the project venv: `venv/Scripts/python.exe -m pip install pytest`. Run tests with `venv/Scripts/python.exe -m pytest`.
+- This project is worked on from both Windows and macOS, and `venv/` is per machine. Check which system you're on and use its interpreter wherever these instructions say `<venv-python>`: `venv/Scripts/python.exe` on Windows, `venv/bin/python` on macOS.
+- If `venv/` is missing, create it: `python -m venv venv` on Windows, `python3 -m venv venv` on macOS. If pytest is missing, install it into the project venv: `<venv-python> -m pip install pytest`. Run tests with `<venv-python> -m pytest`.
 
 ## Fixture
 
@@ -76,7 +77,7 @@ The Python constants (e.g. `VALID_SEX`, `MAX_NAME_LENGTH`, `VALID_TYPES`) are me
 
 ## Finish
 
-Run the full suite (`venv/Scripts/python.exe -m pytest tests`), then report back:
+Run the full suite (`<venv-python> -m pytest tests`), then report back:
 
 1. Files created or changed and roughly how many tests each.
 2. Pass/fail counts.

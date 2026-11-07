@@ -16,7 +16,14 @@ python db.py
 python -c "from patients import register_patient; print(register_patient('Ada', 'Lovelace', '1815-12-10', 'F'))"
 ```
 
-A `venv/` exists at the repo root (activate with `venv\Scripts\activate` on Windows), but nothing is installed in it beyond the standard library.
+This project is worked on from both Windows and macOS. `venv/` lives at the repo root and is gitignored, so each machine needs its own, and nothing is installed in it beyond the standard library. Activate it first so that `python` resolves on both systems:
+
+| | Create | Activate | Interpreter path |
+| --- | --- | --- | --- |
+| **Windows** | `python -m venv venv` | `venv\Scripts\activate` | `venv/Scripts/python.exe` |
+| **macOS** | `/usr/bin/python3 -m venv venv` | `source venv/bin/activate` | `venv/bin/python` |
+
+`STRICT` tables need SQLite 3.37+, and Python uses its own bundled SQLite. On macOS, the default `python3` (3.10.2) has 3.35.5 and fails with `near "STRICT": syntax error`, so build the venv from `/usr/bin/python3`. Rerunning `venv` over an existing one doesn't replace its Python, so delete `venv/` first. Check the version with `python -c "import sqlite3; print(sqlite3.sqlite_version)"`.
 
 `DB_PATH` in [db.py](db.py) is the relative path `"hospital.db"`, so it resolves against the **current working directory**. Run scripts from the repo root, or you'll silently create a new, empty database somewhere else. `*.db` files are gitignored.
 
