@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Patient search{% endblock %}
+{% block content %}
+<form method="get" action="{{ url_for('search') }}">
+  <label for="q">Last name</label>
+  <input id="q" name="q" value="{{ query }}" minlength="2" maxlength="50" required>
+  <button type="submit">Search</button>
+</form>
+
+{% if error %}
+  <p class="error">{{ error }}</p>
+{% elif results is not none %}
+  {% if results %}
+    <div class="table-wrap">
+    <table>
+      <tr><th>MRN</th><th>Name</th><th>Date of birth</th><th>Sex</th></tr>
+      {% for p in results %}
+      <tr>
+        <td><a href="{{ url_for('chart', mrn=p.mrn) }}">{{ p.mrn }}</a></td>
+        <td>{{ p.last_name }}, {{ p.first_name }}</td>
+        <td>{{ p.date_of_birth }}</td>
+        <td>{{ p.sex }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    </div>
+  {% else %}
+    <p>No patients found.</p>
+  {% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% macro local_time(utc) %}{% if utc %}<time datetime="{{ utc | utc_iso }}">{{ utc }} UTC</time>{% endif %}{% endmacro %}
+{% block title %}{{ patient.last_name }}, {{ patient.first_name }}{% endblock %}
+{% block content %}
+<h2>{{ patient.last_name }}, {{ patient.first_name }}</h2>
+<p>MRN {{ patient.mrn }} · DOB {{ patient.date_of_birth }} · Sex {{ patient.sex }}</p>
+
+<h3>Allergies</h3>
+{% if allergies %}
+<div class="table-wrap">
+<table>
+  <tr><th>Substance</th><th>Reaction</th><th>Severity</th></tr>
+  {% for a in allergies %}
+  <tr>
+    <td>{{ a.substance }}</td>
+    <td>{{ a.reaction or "" }}</td>
+    <td class="{{ 'severe' if a.severity == 'severe' else '' }}">{{ a.severity }}</td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+{% else %}
+<p>No allergies recorded.</p>
+{% endif %}
+
+<h3>Active problems</h3>
+{% if conditions %}
+<div class="table-wrap">
+<table>
+  <tr><th>ICD-10</th><th>Description</th><th>Onset</th></tr>
+  {% for c in conditions %}
+  <tr>
+    <td>{{ c.icd10_code }}</td>
+    <td>{{ c.description }}</td>
+    <td>{{ c.onset_date or "Unknown" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+{% else %}
+<p>No active problems recorded.</p>
+{% endif %}
+
+<h3>Encounters</h3>
+{% if encounters %}
+<div class="table-wrap">
+<table>
+  <tr><th>Type</th><th>Reason</th><th>Status</th><th>Started</th><th>Ended</th></tr>
+  {% for e in encounters %}
+  <tr>
+    <td>{{ e.encounter_type }}</td>
+    <td>{{ e.reason }}</td>
+    <td>{{ e.status }}</td>
+    <td>{{ local_time(e.started_at) }}</td>
+    <td>{{ local_time(e.ended_at) }}</td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+{% else %}
+<p>No encounters recorded.</p>
+{% endif %}
+{% endblock %}

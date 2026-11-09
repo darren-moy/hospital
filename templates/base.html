@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Mini EHR{% endblock %}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 0 16px; }
+    .banner { background: #fff3cd; padding: 8px 12px; border: 1px solid #e0c36a; margin: 12px 0; }
+    .error { color: #b00020; }
+    .table-wrap { overflow-x: auto; margin-bottom: 24px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #ddd; }
+    .severe { color: #b00020; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="banner">Demo with synthetic data. Not for clinical use.</div>
+  <h1><a href="{{ url_for('search') }}">Mini EHR</a></h1>
+  {% block content %}{% endblock %}
+  <script>
+    // Timestamps are stored in UTC; show them in the viewer's local time.
+    // Without JavaScript the UTC text rendered by the server stays as is.
+    document.querySelectorAll("time[datetime]").forEach(function (el) {
+      var when = new Date(el.getAttribute("datetime"));
+      if (isNaN(when)) return;
+      el.title = el.textContent;
+      el.textContent = when.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+    });
+  </script>
+</body>
+</html>

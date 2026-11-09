@@ -40,7 +40,7 @@ def close_encounter(encounter_id):
     if cursor.rowcount == 0:
         raise ValueError(f"No open encounter with id {encounter_id}. ")
 
-def list_encounter(mrn):
+def list_encounters(mrn):
     with get_connection() as conn:
         patient_id = _get_patient_id(conn, mrn)
         rows = conn.execute(

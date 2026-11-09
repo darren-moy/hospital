@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A small patient-records backend: plain Python (stdlib `sqlite3` only, no third-party dependencies) over a single SQLite file. There is no CLI, web layer, linter config, or requirements file yet. The modules expose plain functions meant to be called from a REPL or a future frontend.
+A small patient-records app: plain Python domain modules (stdlib `sqlite3` only) over a single SQLite file, with a read-only Flask web layer on top. There is no CLI or linter config yet. The domain modules expose plain functions; [app.py](app.py) calls them and renders Jinja templates from `templates/`.
 
 **Use only fake patient data.** Never put real patient information in `hospital.db`, test fixtures, seed scripts, examples, or commit messages, even for debugging. Use obviously fictional names (e.g. Ada Lovelace) and made-up dates.
 
@@ -16,9 +16,16 @@ python db.py
 
 # Exercise the functions interactively (run from the repo root)
 python -c "from patients import register_patient; print(register_patient('Ada', 'Lovelace', '1815-12-10', 'F'))"
+
+# Run the web app at http://127.0.0.1:5000 (debug mode only when FLASK_DEBUG=1)
+python app.py
+
+# Tests
+python -m pytest tests
+python -m pytest tests/schema/test_vitals.py::test_name   # single test
 ```
 
-This project is worked on from both Windows and macOS. `venv/` lives at the repo root and is gitignored, so each machine needs its own, and nothing is installed in it beyond the standard library. Activate it first so that `python` resolves on both systems:
+This project is worked on from both Windows and macOS. `venv/` lives at the repo root and is gitignored, so each machine needs its own. Install dependencies with `pip install -r requirements-dev.txt` (app plus pytest); a server only needs `requirements.txt`. Activate the venv first so that `python` resolves on both systems:
 
 | | Create | Activate | Interpreter path |
 | --- | --- | --- | --- |
@@ -26,12 +33,6 @@ This project is worked on from both Windows and macOS. `venv/` lives at the repo
 | **macOS** | `/usr/bin/python3 -m venv venv` | `source venv/bin/activate` | `venv/bin/python` |
 
 `STRICT` tables need SQLite 3.37+, and Python uses its own bundled SQLite. On macOS, the default `python3` (3.10.2) has 3.35.5 and fails with `near "STRICT": syntax error`, so build the venv from `/usr/bin/python3`. Rerunning `venv` over an existing one doesn't replace its Python, so delete `venv/` first. Check the version with `python -c "import sqlite3; print(sqlite3.sqlite_version)"`.
-
-```bash
-# Tests on Windows (pytest is not in the venv there yet: pip install fails with an SSL certificate error, so use the system Python 3.11)
-py -3.11 -m pytest tests
-py -3.11 -m pytest tests/schema/test_vitals.py::test_name   # single test
-```
 
 `tests/conftest.py` has an autouse fixture that points `db.DB_PATH` at a temporary file, so tests never touch `hospital.db`. It also provides `patient`, `open_encounter`, and `closed_encounter` fixtures. `tests/schema/` is generated and maintained by the `schema-test-writer` agent (`.claude/agents/`); put hand-written tests elsewhere under `tests/`.
 
@@ -46,6 +47,7 @@ py -3.11 -m pytest tests/schema/test_vitals.py::test_name   # single test
   2. Turn the patient's MRN into the internal `patients.id` with `patients._get_patient_id(conn, mrn)`, which raises `ValueError` if no patient has that MRN. Public APIs take the **MRN**, never the internal id.
   3. Run parameterized SQL, and translate `sqlite3.IntegrityError` into a `ValueError` with a domain-specific message.
   4. Return `dict(row)` or `[dict(row) ...]`, never raw `sqlite3.Row` objects.
+- **[app.py](app.py)** is a thin Flask layer: routes call the public domain functions, catch `ValueError` to show its message on the page, and pass the returned dicts to templates. Keep SQL and validation in the domain modules, not in routes. Jinja autoescaping stays on; never use `|safe` or `Markup()` on stored data. Timestamps are shown with the chart template's `local_time` macro, which renders the UTC text plus a `<time datetime="...Z">` that a script in `base.html` converts to the viewer's local time.
 - **Validation is duplicated on purpose**: Python constants (`VALID_SEX`, `MAX_NAME_LENGTH`, `VALID_TYPES`, etc.) mirror the `CHECK` constraints in `schema.sql`. When you change one, change the other.
 - **MRNs** are stored as TEXT. They are generated sequentially, starting at `100001`, by `_next_mrn()` using `MAX(CAST(mrn AS INTEGER)) + 1` inside the same transaction as the insert.
 - **Invariants enforced in the database**:
