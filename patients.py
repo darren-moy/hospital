@@ -1,14 +1,23 @@
+import re
 from datetime import date
 from db import get_connection
 
 VALID_SEX = {"F", "M", "O", "U"}
-MAX_NAME_LENGTH = 50 
+MAX_NAME_LENGTH = 50
 FIRST_MRN = 100001
+# date.fromisoformat also accepts compact forms like 20200101, so check the shape first
+DATE_PATTERN = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
+
+def _clean_mrn(value):
+    if not isinstance(value, str):
+        raise ValueError("MRN must be text.")
+    return value.strip()
 
 def _get_patient_id(conn, mrn):
+    mrn = _clean_mrn(mrn)
     row = conn.execute(
         "SELECT id FROM patients WHERE mrn = ?",
-        [mrn.strip()],
+        [mrn],
     ).fetchone()
     if row is None:
         raise ValueError(f"No patient with MRN {mrn}.")
@@ -23,9 +32,11 @@ def _clean_name(value, field):
     return  value 
 
 def _clean_dob(value):
-    try: 
+    if not isinstance(value, str) or not DATE_PATTERN.fullmatch(value.strip()):
+        raise ValueError("Date of birth must be a real date in YYYY-MM-DD format.")
+    try:
         dob = date.fromisoformat(value.strip())
-    except:
+    except ValueError:
         raise ValueError("Date of birth must be a real date in YYYY-MM-DD format.")
     if dob > date.today():
         raise ValueError("Date of birth cannot be in the future.")
@@ -63,14 +74,17 @@ def register_patient(first_name, last_name, date_of_birth, sex):
     return mrn 
 
 def find_patient_by_mrn(mrn):
+    mrn = _clean_mrn(mrn)
     with get_connection() as conn:
         row = conn.execute(
             "SELECT * FROM patients WHERE mrn = ?",
-            [mrn.strip()],
+            [mrn],
         ).fetchone()
     return dict(row) if row else None
 
 def search_by_last_name(text):
+    if not isinstance(text, str):
+        raise ValueError("Search text must be text.")
     text = text.strip()
     if len(text) < 2:
         raise ValueError("Type at least 2 letters to search.")
