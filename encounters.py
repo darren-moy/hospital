@@ -1,16 +1,16 @@
 import sqlite3
 
-from db import get_connection
-from patients import _get_patient_id
+from db import MAX_SQLITE_INT, get_connection
+from patients import _clean_text, _get_patient_id
 
 VALID_TYPES = {"outpatient", 'emergency', 'inpatient'}
 MAX_REASON_LENGTH = 200
 
 def start_encounter(mrn, encounter_type, reason):
-    encounter_type = encounter_type.strip().lower()
+    encounter_type = _clean_text(encounter_type, "Type").lower()
     if encounter_type not in VALID_TYPES:
         raise ValueError(f"Type must be outpatient, emergency, or inpatient.")
-    reason = reason.strip()
+    reason = _clean_text(reason, "Reason")
     if not 1 <= len(reason) <= 200:
         raise ValueError(f"Reason must be 1 to {MAX_REASON_LENGTH} characters.")
 
@@ -27,7 +27,8 @@ def start_encounter(mrn, encounter_type, reason):
         return cursor.lastrowid
 
 def close_encounter(encounter_id):
-    if not isinstance(encounter_id, int) or encounter_id < 1:
+    # bool is a subclass of int, so True would otherwise close encounter 1
+    if isinstance(encounter_id, bool) or not isinstance(encounter_id, int) or not 1 <= encounter_id <= MAX_SQLITE_INT:
         raise ValueError("Encounter id must be a positive whole number.")
 
     with get_connection() as conn:

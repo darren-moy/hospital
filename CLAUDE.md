@@ -34,7 +34,12 @@ This project is worked on from both Windows and macOS. `venv/` lives at the repo
 
 `STRICT` tables need SQLite 3.37+, and Python uses its own bundled SQLite. On macOS, the default `python3` (3.10.2) has 3.35.5 and fails with `near "STRICT": syntax error`, so build the venv from `/usr/bin/python3`. Rerunning `venv` over an existing one doesn't replace its Python, so delete `venv/` first. Check the version with `python -c "import sqlite3; print(sqlite3.sqlite_version)"`.
 
-`tests/conftest.py` has an autouse fixture that points `db.DB_PATH` at a temporary file, so tests never touch `hospital.db`. It also provides `patient`, `open_encounter`, and `closed_encounter` fixtures. `tests/schema/` is generated and maintained by the `schema-test-writer` agent (`.claude/agents/`); put hand-written tests elsewhere under `tests/`.
+`tests/conftest.py` has an autouse fixture that points `db.DB_PATH` at a temporary file, so tests never touch `hospital.db`. It also provides `patient`, `open_encounter`, and `closed_encounter` fixtures. `tests/schema/` is generated and maintained by the `schema-test-writer` agent (`.claude/agents/`); put hand-written tests elsewhere under `tests/`:
+
+- `tests/unit/`: each module's functions and the Flask routes (happy paths, limits, error messages). Tests marked `xfail(strict=True)` document known bugs; when you fix one, pytest fails until you remove the marker.
+- `tests/regression/`: one test per bug we already fixed. When you fix a bug, add a test here that fails without the fix.
+
+Run one group with `python -m pytest tests/unit`, `tests/regression` or `tests/schema`. Give test files unique names across folders, since the folders have no `__init__.py`.
 
 `DB_PATH` in [db.py](db.py) is the relative path `"hospital.db"`, so it resolves against the **current working directory**. Run scripts from the repo root, or you'll silently create a new, empty database somewhere else. `*.db` files are gitignored.
 

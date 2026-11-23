@@ -2,13 +2,12 @@ import re
 import sqlite3
 from datetime import date
 
-from db import get_connection
+from db import MAX_SQLITE_INT, get_connection
 from patients import _get_patient_id
 
 ICD10_PATTERN = re.compile(r"[A-Z][0-9][0-9A-Z](\.[0-9A-Z]{1,4})?")
 DATE_PATTERN = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 MAX_DESCRIPTION_LENGTH = 200
-MAX_SQLITE_INT = 2**63 - 1
 
 
 def _clean_code(code):

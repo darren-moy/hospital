@@ -1,6 +1,6 @@
 import sqlite3
 from db import get_connection
-from patients import _get_patient_id
+from patients import _clean_text, _get_patient_id
 
 VALID_SEVERITIY = {"mild", "moderate", "severe"}
 MAX_SUBSTANCE_LENGTH = 100 
@@ -8,16 +8,16 @@ MAX_REACTION_LENGTH = 200
 
 
 def add_allergy(mrn, substance, severity, reaction=None):
-    substance = substance.strip()
+    substance = _clean_text(substance, "Substance")
     if not 1 <= len(substance) <= MAX_SUBSTANCE_LENGTH:
         raise ValueError(f"Substance must be 1 to {MAX_SUBSTANCE_LENGTH} characters.")
-    
-    severity = severity.strip().lower()
+
+    severity = _clean_text(severity, "Severity").lower()
     if severity not in VALID_SEVERITIY:
         raise ValueError("Severity must be: mild, moderate, severe.")
-    
+
     if reaction is not None:
-        reaction = reaction.strip()
+        reaction = _clean_text(reaction, "Reaction")
         if reaction == "":
             reaction = None
         elif len(reaction) > MAX_REACTION_LENGTH:

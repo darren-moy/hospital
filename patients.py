@@ -8,10 +8,14 @@ FIRST_MRN = 100001
 # date.fromisoformat also accepts compact forms like 20200101, so check the shape first
 DATE_PATTERN = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 
-def _clean_mrn(value):
+def _clean_text(value, field):
+    """Shared by the modules that take free text: reject non-strings, then strip."""
     if not isinstance(value, str):
-        raise ValueError("MRN must be text.")
+        raise ValueError(f"{field} must be text.")
     return value.strip()
+
+def _clean_mrn(value):
+    return _clean_text(value, "MRN")
 
 def _get_patient_id(conn, mrn):
     mrn = _clean_mrn(mrn)
