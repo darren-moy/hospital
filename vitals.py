@@ -53,7 +53,7 @@ def record_vitals(encounter_id, systolic=None, diastolic=None, heart_rate=None, 
         cursor = conn.execute(
             "INSERT INTO vitals (encounter_id, systolic, diastolic, heart_rate, temperature_f, resp_rate, spo2) "
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [encounter_id, systolic, diastolic, heart_rate, temperature_f, resp_rate, spo2], 
+            [encounter_id, systolic, diastolic, heart_rate, temperature_f, resp_rate, spo2],
         )
     return cursor.lastrowid
 

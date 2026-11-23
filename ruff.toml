@@ -1,0 +1,10 @@
+target-version = "py311"
+line-length = 100
+
+[lint]
+# E/W: pycodestyle style, F: pyflakes (unused names, undefined names), B: likely bugs, I: import order
+select = ["E", "F", "W", "B", "I"]
+ignore = ["E501"]
+
+[format]
+exclude = ["tests/schema"]

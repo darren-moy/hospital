@@ -10,11 +10,9 @@ import pytest
 
 from allergies import add_allergy, list_allergies
 from app import app, utc_iso
-from conditions import add_condition
 from db import get_connection
 from encounters import close_encounter, list_encounters, open_encounters, start_encounter
 from patients import find_patient_by_mrn, register_patient, search_by_last_name
-
 
 # --- patients.py ---------------------------------------------------------------
 

@@ -1,10 +1,11 @@
 import sqlite3
+
 from db import get_connection
 from patients import _clean_text, _get_patient_id
 
 VALID_SEVERITIY = {"mild", "moderate", "severe"}
-MAX_SUBSTANCE_LENGTH = 100 
-MAX_REACTION_LENGTH = 200 
+MAX_SUBSTANCE_LENGTH = 100
+MAX_REACTION_LENGTH = 200
 
 
 def add_allergy(mrn, substance, severity, reaction=None):
@@ -32,7 +33,7 @@ def add_allergy(mrn, substance, severity, reaction=None):
                 [patient_id, substance, reaction, severity],
             )
         except sqlite3.IntegrityError:
-            raise ValueError(f"{substance} is already on this patient's allergy list.")
+            raise ValueError(f"{substance} is already on this patient's allergy list.") from None
 
 def list_allergies(mrn):
     with get_connection() as conn:

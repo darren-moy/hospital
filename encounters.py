@@ -9,7 +9,7 @@ MAX_REASON_LENGTH = 200
 def start_encounter(mrn, encounter_type, reason):
     encounter_type = _clean_text(encounter_type, "Type").lower()
     if encounter_type not in VALID_TYPES:
-        raise ValueError(f"Type must be outpatient, emergency, or inpatient.")
+        raise ValueError("Type must be outpatient, emergency, or inpatient.")
     reason = _clean_text(reason, "Reason")
     if not 1 <= len(reason) <= 200:
         raise ValueError(f"Reason must be 1 to {MAX_REASON_LENGTH} characters.")
@@ -23,7 +23,7 @@ def start_encounter(mrn, encounter_type, reason):
                 [patient_id, encounter_type, reason],
             )
         except sqlite3.IntegrityError:
-            raise ValueError("This patient already has an open encounter. Close it first to continue. ")
+            raise ValueError("This patient already has an open encounter. Close it first to continue. ") from None
         return cursor.lastrowid
 
 def close_encounter(encounter_id):

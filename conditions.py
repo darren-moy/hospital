@@ -39,7 +39,7 @@ def _clean_date(value, field):
     try:
         parsed = date.fromisoformat(value.strip())
     except ValueError:
-        raise ValueError(f"{field} must be a real date in YYYY-MM-DD format.")
+        raise ValueError(f"{field} must be a real date in YYYY-MM-DD format.") from None
     if parsed > date.today():
         raise ValueError(f"{field} can't be in the future.")
     return parsed.isoformat()
@@ -60,8 +60,8 @@ def add_condition(mrn, icd10_code, description, onset_date=None):
             )
         except sqlite3.IntegrityError as e:
             if "UNIQUE" in str(e):
-                raise ValueError(f"{icd10_code} is already an active problem for this patient.")
-            raise ValueError("Condition could not be saved because a value is invalid.")
+                raise ValueError(f"{icd10_code} is already an active problem for this patient.") from None
+            raise ValueError("Condition could not be saved because a value is invalid.") from None
         return cursor.lastrowid
 
 
@@ -78,7 +78,7 @@ def resolve_condition(condition_id, resolved_date=None):
                 [resolved_date, condition_id],
             )
         except sqlite3.IntegrityError:
-            raise ValueError("Resolved date can't be before the onset date.")
+            raise ValueError("Resolved date can't be before the onset date.") from None
         if cursor.rowcount == 0:
             raise ValueError(f"No active condition with id {condition_id}.")
 

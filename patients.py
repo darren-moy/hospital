@@ -1,5 +1,6 @@
 import re
 from datetime import date
+
 from db import get_connection
 
 VALID_SEX = {"F", "M", "O", "U"}
@@ -33,7 +34,7 @@ def _clean_name(value, field):
     value = value.strip()
     if not 1 <= len(value) <= MAX_NAME_LENGTH:
         raise ValueError(f"{field} must be 1 to {MAX_NAME_LENGTH} characters.")
-    return  value 
+    return  value
 
 def _clean_dob(value):
     if not isinstance(value, str) or not DATE_PATTERN.fullmatch(value.strip()):
@@ -41,7 +42,7 @@ def _clean_dob(value):
     try:
         dob = date.fromisoformat(value.strip())
     except ValueError:
-        raise ValueError("Date of birth must be a real date in YYYY-MM-DD format.")
+        raise ValueError("Date of birth must be a real date in YYYY-MM-DD format.")from None
     if dob > date.today():
         raise ValueError("Date of birth cannot be in the future.")
     return dob.isoformat()
@@ -51,8 +52,8 @@ def _clean_sex(value):
         raise ValueError("Sex must be F, M, O, U.")
     return value.strip().upper()
 
-# MRN Generator 
-# Query for a row, if no row then start at 100001, otherwise one more than highest stored as a text 
+# MRN Generator
+# Query for a row, if no row then start at 100001, otherwise one more than highest stored as a text
 def _next_mrn(conn):
     row = conn.execute(
         "SELECT MAX(CAST(mrn AS INTEGER)) AS last FROM patients"
@@ -75,7 +76,7 @@ def register_patient(first_name, last_name, date_of_birth, sex):
             "VALUES (?, ?, ?, ?, ?)",
             [mrn, first_name, last_name, date_of_birth, sex],
         )
-    return mrn 
+    return mrn
 
 def find_patient_by_mrn(mrn):
     mrn = _clean_mrn(mrn)

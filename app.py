@@ -17,8 +17,8 @@ def utc_iso(value):
 @app.route("/")
 def search ():
     query = request.args.get("q", "").strip()
-    results = None 
-    error = None 
+    results = None
+    error = None
     if query:
         try:
             results = search_by_last_name(query)
@@ -34,7 +34,7 @@ def chart(mrn):
     return render_template(
         "chart.html",
         patient = patient,
-        allergies = list_allergies(mrn), 
+        allergies = list_allergies(mrn),
         conditions = list_conditions(mrn),
         encounters = list_encounters(mrn)
     )
