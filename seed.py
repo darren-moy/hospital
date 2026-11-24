@@ -23,7 +23,9 @@ def seed_lovelace():
     add_condition(mrn, "I10", "High blood pressure", onset_date="2021-07-02")
 
     visit = start_encounter(mrn, "outpatient", "Annual checkup")
-    record_vitals(visit, systolic=148, diastolic=94, heart_rate=76, temperature_f=98.4, resp_rate=16, spo2=98)
+    record_vitals(
+        visit, systolic=148, diastolic=94, heart_rate=76, temperature_f=98.4, resp_rate=16, spo2=98
+    )
     close_encounter(visit)
     return mrn
 
@@ -35,12 +37,22 @@ def seed_turing():
     resolve_condition(flu, "2026-01-19")
 
     visit = start_encounter(mrn, "emergency", "Fever and cough")
-    record_vitals(visit, systolic=118, diastolic=76, heart_rate=112, temperature_f=101.8, resp_rate=24, spo2=93)
+    record_vitals(
+        visit,
+        systolic=118,
+        diastolic=76,
+        heart_rate=112,
+        temperature_f=101.8,
+        resp_rate=24,
+        spo2=93,
+    )
     close_encounter(visit)
 
     # Left open so the chart shows a visit in progress
     visit = start_encounter(mrn, "outpatient", "Follow-up")
-    record_vitals(visit, systolic=120, diastolic=78, heart_rate=68, temperature_f=98.6, resp_rate=14, spo2=99)
+    record_vitals(
+        visit, systolic=120, diastolic=78, heart_rate=68, temperature_f=98.6, resp_rate=14, spo2=99
+    )
     return mrn
 
 

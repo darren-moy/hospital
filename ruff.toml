@@ -7,4 +7,4 @@ select = ["E", "F", "W", "B", "I"]
 ignore = ["E501"]
 
 [format]
-exclude = ["tests/schema"]
+exclude = ["tests/schema/**", "*.md"]

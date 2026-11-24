@@ -35,14 +35,17 @@ def add_allergy(mrn, substance, severity, reaction=None):
         except sqlite3.IntegrityError:
             raise ValueError(f"{substance} is already on this patient's allergy list.") from None
 
+
 def list_allergies(mrn):
     with get_connection() as conn:
         patient_id = _get_patient_id(conn, mrn)
         rows = conn.execute(
             "SELECT substance, reaction, severity, recorded_at FROM allergies WHERE patient_id = ? "
-            "ORDER BY CASE severity WHEN 'severe' THEN 1 WHEN 'moderate' THEN 2 ELSE 3 END, substance",[patient_id]
+            "ORDER BY CASE severity WHEN 'severe' THEN 1 WHEN 'moderate' THEN 2 ELSE 3 END, substance",
+            [patient_id],
         ).fetchall()
     return [dict(row) for row in rows]
+
 
 def patients_without_allergies():
     with get_connection() as conn:

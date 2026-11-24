@@ -1,4 +1,5 @@
 """Unit tests: Flask routes in app.py (read-only pages)."""
+
 import pytest
 
 from allergies import add_allergy
@@ -55,7 +56,14 @@ def test_chart_shows_allergies_problems_and_encounters(client, patient):
     add_condition(patient, "E11.9", "Type 2 diabetes", onset_date="2020-01-01")
     start_encounter(patient, "outpatient", "Annual checkup")
     page = client.get(f"/patients/{patient}").data
-    for text in [b"Penicillin", b"Hives", b"E11.9", b"Type 2 diabetes", b"2020-01-01", b"Annual checkup"]:
+    for text in [
+        b"Penicillin",
+        b"Hives",
+        b"E11.9",
+        b"Type 2 diabetes",
+        b"2020-01-01",
+        b"Annual checkup",
+    ]:
         assert text in page
 
 

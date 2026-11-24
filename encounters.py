@@ -3,8 +3,9 @@ import sqlite3
 from db import MAX_SQLITE_INT, get_connection
 from patients import _clean_text, _get_patient_id
 
-VALID_TYPES = {"outpatient", 'emergency', 'inpatient'}
+VALID_TYPES = {"outpatient", "emergency", "inpatient"}
 MAX_REASON_LENGTH = 200
+
 
 def start_encounter(mrn, encounter_type, reason):
     encounter_type = _clean_text(encounter_type, "Type").lower()
@@ -18,17 +19,23 @@ def start_encounter(mrn, encounter_type, reason):
         patient_id = _get_patient_id(conn, mrn)
         try:
             cursor = conn.execute(
-                "INSERT INTO encounters (patient_id, encounter_type, reason) "
-                "VALUES (?, ?, ?)",
+                "INSERT INTO encounters (patient_id, encounter_type, reason) VALUES (?, ?, ?)",
                 [patient_id, encounter_type, reason],
             )
         except sqlite3.IntegrityError:
-            raise ValueError("This patient already has an open encounter. Close it first to continue. ") from None
+            raise ValueError(
+                "This patient already has an open encounter. Close it first to continue. "
+            ) from None
         return cursor.lastrowid
+
 
 def close_encounter(encounter_id):
     # bool is a subclass of int, so True would otherwise close encounter 1
-    if isinstance(encounter_id, bool) or not isinstance(encounter_id, int) or not 1 <= encounter_id <= MAX_SQLITE_INT:
+    if (
+        isinstance(encounter_id, bool)
+        or not isinstance(encounter_id, int)
+        or not 1 <= encounter_id <= MAX_SQLITE_INT
+    ):
         raise ValueError("Encounter id must be a positive whole number.")
 
     with get_connection() as conn:
@@ -41,6 +48,7 @@ def close_encounter(encounter_id):
     if cursor.rowcount == 0:
         raise ValueError(f"No open encounter with id {encounter_id}. ")
 
+
 def list_encounters(mrn):
     with get_connection() as conn:
         patient_id = _get_patient_id(conn, mrn)
@@ -52,6 +60,7 @@ def list_encounters(mrn):
             [patient_id],
         ).fetchall()
     return [dict(row) for row in rows]
+
 
 # Everyone being seen currently
 def open_encounters():

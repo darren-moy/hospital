@@ -3,7 +3,8 @@ from pathlib import Path
 
 DB_PATH = "hospital.db"
 SCHEMA_PATH = Path(__file__).parent / "schema.sql"
-MAX_SQLITE_INT = 2**63 - 1   # larger Python ints raise OverflowError when bound to a query
+MAX_SQLITE_INT = 2**63 - 1  # larger Python ints raise OverflowError when bound to a query
+
 
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -11,11 +12,12 @@ def get_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+
 def init_db():
     with get_connection() as conn:
         conn.executescript(SCHEMA_PATH.read_text())
 
+
 if __name__ == "__main__":
     init_db()
     print("Database ready.")
-

@@ -4,6 +4,7 @@ When you fix a bug, add a test here that fails without the fix. Name it after th
 bug and say in the docstring what went wrong. (The conditions and vitals fixes are
 pinned down in tests/schema/, which covers them in more depth.)
 """
+
 import sqlite3
 
 import pytest
@@ -15,6 +16,7 @@ from encounters import close_encounter, list_encounters, open_encounters, start_
 from patients import find_patient_by_mrn, register_patient, search_by_last_name
 
 # --- patients.py ---------------------------------------------------------------
+
 
 @pytest.mark.parametrize("bad", [None, 100001, 1.5, ["100001"], b"100001"])
 def test_non_text_mrn_gives_value_error_not_attribute_error(bad):
@@ -54,9 +56,16 @@ def test_search_treats_percent_and_underscore_literally(patient):
 
 # --- allergies.py / encounters.py ----------------------------------------------
 
-@pytest.mark.parametrize("args", [
-    (None, "mild"), ("Latex", None), (5, "mild"), ("Latex", ["mild"]),
-])
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        (None, "mild"),
+        ("Latex", None),
+        (5, "mild"),
+        ("Latex", ["mild"]),
+    ],
+)
 def test_add_allergy_non_text_input_gives_value_error(patient, args):
     """Non-text substance or severity used to crash with AttributeError on .strip()."""
     with pytest.raises(ValueError, match="must be text"):
@@ -69,7 +78,9 @@ def test_add_allergy_non_text_reaction_gives_value_error(patient):
     assert list_allergies(patient) == []
 
 
-@pytest.mark.parametrize("args", [(None, "Reason"), ("outpatient", None), (5, "Reason"), ("outpatient", 5)])
+@pytest.mark.parametrize(
+    "args", [(None, "Reason"), ("outpatient", None), (5, "Reason"), ("outpatient", 5)]
+)
 def test_start_encounter_non_text_input_gives_value_error(patient, args):
     """Non-text type or reason used to crash with AttributeError on .strip()."""
     with pytest.raises(ValueError, match="must be text"):
@@ -82,7 +93,7 @@ def test_close_encounter_rejects_booleans(open_encounter):
     assert open_encounter == 1
     with pytest.raises(ValueError, match="positive whole number"):
         close_encounter(True)
-    assert open_encounters()[0]["id"] == open_encounter   # still open
+    assert open_encounters()[0]["id"] == open_encounter  # still open
 
 
 @pytest.mark.parametrize("huge", [2**63, 2**70])
@@ -93,6 +104,7 @@ def test_close_encounter_huge_id_gives_value_error(huge):
 
 
 # --- schema.sql ----------------------------------------------------------------
+
 
 @pytest.mark.parametrize("dob", ["2023-02-29", "2020-13-01", "2020-04-31", "not a date"])
 def test_database_rejects_impossible_birth_dates_even_without_python(dob):
@@ -125,6 +137,7 @@ def test_patient_with_records_cannot_be_deleted(patient):
 
 
 # --- app.py --------------------------------------------------------------------
+
 
 def test_stored_html_is_escaped_on_the_chart(patient):
     """Anything typed into a record must show as text, never run as HTML."""

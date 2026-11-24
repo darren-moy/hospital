@@ -1,4 +1,5 @@
 """Unit tests: encounters.py."""
+
 import pytest
 
 from encounters import close_encounter, list_encounters, open_encounters, start_encounter
@@ -112,7 +113,10 @@ def test_open_encounters_shows_only_open_ones_with_patient_names(patient, open_e
     close_encounter(done)
     [row] = open_encounters()
     assert (row["id"], row["mrn"], row["last_name"], row["first_name"]) == (
-        open_encounter, patient, "Lovelace", "Ada",
+        open_encounter,
+        patient,
+        "Lovelace",
+        "Ada",
     )
 
 

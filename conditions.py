@@ -60,13 +60,19 @@ def add_condition(mrn, icd10_code, description, onset_date=None):
             )
         except sqlite3.IntegrityError as e:
             if "UNIQUE" in str(e):
-                raise ValueError(f"{icd10_code} is already an active problem for this patient.") from None
+                raise ValueError(
+                    f"{icd10_code} is already an active problem for this patient."
+                ) from None
             raise ValueError("Condition could not be saved because a value is invalid.") from None
         return cursor.lastrowid
 
 
 def resolve_condition(condition_id, resolved_date=None):
-    if isinstance(condition_id, bool) or not isinstance(condition_id, int) or not 1 <= condition_id <= MAX_SQLITE_INT:
+    if (
+        isinstance(condition_id, bool)
+        or not isinstance(condition_id, int)
+        or not 1 <= condition_id <= MAX_SQLITE_INT
+    ):
         raise ValueError("Condition id must be a positive whole number.")
     resolved_date = _clean_date(resolved_date, "Resolved date") or date.today().isoformat()
 

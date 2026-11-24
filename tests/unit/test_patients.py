@@ -1,4 +1,5 @@
 """Unit tests: patients.py behaves as documented for normal and edge-case input."""
+
 import pytest
 
 from patients import find_patient_by_mrn, register_patient, search_by_last_name
@@ -18,7 +19,10 @@ def test_registered_patient_is_stored_cleaned_up():
     mrn = register_patient("  Ada ", " Lovelace  ", " 1815-12-10 ", " f ")
     p = find_patient_by_mrn(mrn)
     assert (p["first_name"], p["last_name"], p["date_of_birth"], p["sex"]) == (
-        "Ada", "Lovelace", "1815-12-10", "F",
+        "Ada",
+        "Lovelace",
+        "1815-12-10",
+        "F",
     )
 
 
@@ -71,7 +75,7 @@ def test_today_is_a_valid_birth_date():
 
 def test_search_matches_start_of_last_name_ignoring_case(patient):
     assert [p["mrn"] for p in search_by_last_name("love")] == [patient]
-    assert search_by_last_name("ace") == []   # prefix only, not "contains"
+    assert search_by_last_name("ace") == []  # prefix only, not "contains"
 
 
 def test_search_sorts_by_last_then_first_name():

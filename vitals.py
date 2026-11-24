@@ -2,13 +2,14 @@ from db import get_connection
 
 # NOT REAL RANGES for demonstration purposes
 VITALS = {
-    "systolic":      ("Systolic pressure",  50, 300),
-    "diastolic":     ("Diastolic pressure", 20, 200),
-    "heart_rate":    ("Heart rate",         20, 300),
-    "temperature_f": ("Temperature (°F)",   85, 115),
-    "resp_rate":     ("Breathing rate",      4,  80),
-    "spo2":          ("Oxygen saturation",  50, 100),
+    "systolic": ("Systolic pressure", 50, 300),
+    "diastolic": ("Diastolic pressure", 20, 200),
+    "heart_rate": ("Heart rate", 20, 300),
+    "temperature_f": ("Temperature (°F)", 85, 115),
+    "resp_rate": ("Breathing rate", 4, 80),
+    "spo2": ("Oxygen saturation", 50, 100),
 }
+
 
 def _check_number(field, value, allow_decimal=False):
     label, low, high = VITALS[field]
@@ -23,6 +24,7 @@ def _check_number(field, value, allow_decimal=False):
         raise ValueError(f"{label} must be between {low} and {high}.")
     return value
 
+
 def _require_open_encounter(conn, encounter_id):
     row = conn.execute(
         "SELECT status FROM encounters WHERE id = ?",
@@ -33,7 +35,16 @@ def _require_open_encounter(conn, encounter_id):
     if row["status"] != "open":
         raise ValueError("Vitals can only be recorded during an open encounter.")
 
-def record_vitals(encounter_id, systolic=None, diastolic=None, heart_rate=None, temperature_f=None, resp_rate=None, spo2=None):
+
+def record_vitals(
+    encounter_id,
+    systolic=None,
+    diastolic=None,
+    heart_rate=None,
+    temperature_f=None,
+    resp_rate=None,
+    spo2=None,
+):
     systolic = _check_number("systolic", systolic)
     diastolic = _check_number("diastolic", diastolic)
     heart_rate = _check_number("heart_rate", heart_rate)
@@ -45,7 +56,7 @@ def record_vitals(encounter_id, systolic=None, diastolic=None, heart_rate=None, 
         raise ValueError("Blood pressure needs both systolic and diastolic.")
     if systolic is not None and systolic <= diastolic:
         raise ValueError("Systolic pressure must be higher than diastolic pressure.")
-    if all( v is None for v in [systolic, heart_rate, temperature_f, resp_rate, spo2]):
+    if all(v is None for v in [systolic, heart_rate, temperature_f, resp_rate, spo2]):
         raise ValueError("Enter at least one vital sign.")
 
     with get_connection() as conn:
@@ -56,6 +67,7 @@ def record_vitals(encounter_id, systolic=None, diastolic=None, heart_rate=None, 
             [encounter_id, systolic, diastolic, heart_rate, temperature_f, resp_rate, spo2],
         )
     return cursor.lastrowid
+
 
 def abnormal_flags(v):
     flags = []
@@ -84,8 +96,7 @@ def abnormal_flags(v):
 def list_vitals(encounter_id):
     with get_connection() as conn:
         rows = conn.execute(
-            "SELECT * FROM vitals WHERE encounter_id = ? "
-            "ORDER BY recorded_at DESC, id DESC",
+            "SELECT * FROM vitals WHERE encounter_id = ? ORDER BY recorded_at DESC, id DESC",
             [encounter_id],
         ).fetchall()
     results = []

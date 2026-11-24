@@ -1,4 +1,5 @@
 """Unit tests: allergies.py."""
+
 import pytest
 
 from allergies import add_allergy, list_allergies, patients_without_allergies
@@ -34,7 +35,10 @@ def test_list_is_severe_first_then_alphabetical(patient):
     add_allergy(patient, "Penicillin", "severe")
     add_allergy(patient, "Aspirin", "mild")
     assert [a["substance"] for a in list_allergies(patient)] == [
-        "Penicillin", "Peanuts", "Aspirin", "Latex",
+        "Penicillin",
+        "Peanuts",
+        "Aspirin",
+        "Latex",
     ]
 
 
@@ -114,5 +118,7 @@ def test_patients_without_allergies_is_sorted_by_name():
     register_patient("Amy", "Smith", "2000-01-01", "F")
     register_patient("Bob", "Adams", "2000-01-01", "M")
     assert [(p["last_name"], p["first_name"]) for p in patients_without_allergies()] == [
-        ("Adams", "Bob"), ("Smith", "Amy"), ("Smith", "Zed"),
+        ("Adams", "Bob"),
+        ("Smith", "Amy"),
+        ("Smith", "Zed"),
     ]
