@@ -1,4 +1,5 @@
 # Mini EHR
+![Tests](https://github.com/darren-moy/hospital/actions/workflows/tests.yml/badge.svg)
 
 A small patient-records app I'm building to learn backend development. Python and SQLite underneath, with a Flask site for looking patients up.
 
