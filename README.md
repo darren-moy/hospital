@@ -5,7 +5,7 @@ A small patient-records app I'm building to learn backend development. Python an
 
 It tracks patients, allergies, visits (encounters), vital signs and diagnoses (ICD-10 conditions).
 
-> All data is fake. This is a practice project, not a clinical system, and the vital-sign thresholds are simplified. Fake patients name: Ada Lovelace, Alan Turing, Grace Hopper, Marie Curie
+> All data is synthetic. This is a practice project, not a clinical system, and the vital-sign thresholds are simplified. Fake patients name: Ada Lovelace, Alan Turing, Grace Hopper, Marie Curie
 
 ## What it does
 
@@ -16,6 +16,7 @@ It tracks patients, allergies, visits (encounters), vital signs and diagnoses (I
 - Vitals recorded during an open encounter, with flags like "High blood pressure" or "Fever"
 - A problem list using ICD-10 codes (`I10`, `E11.9`), active or resolved
 - Web pages for patient search and a basic chart
+- Shows vitals from synthetic patients on their chart
 
 Validation happens in Python first, then again in the database through `CHECK` constraints, foreign keys and unique indexes in `schema.sql`. So bad data gets rejected even if something skips the Python functions.
 
@@ -117,6 +118,5 @@ tests/          pytest (tests/schema/ is generated)
 ## Known gaps / todo
 
 - Can't add or edit records from the website yet
-- Vitals aren't shown on the chart
 - No login
 - No migrations: if `schema.sql` changes, delete `hospital.db` and run `python db.py` again

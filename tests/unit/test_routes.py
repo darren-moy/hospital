@@ -6,6 +6,7 @@ from allergies import add_allergy
 from app import app
 from conditions import add_condition
 from encounters import start_encounter
+from vitals import record_vitals
 
 
 @pytest.fixture
@@ -49,6 +50,7 @@ def test_empty_chart_shows_empty_messages(client, patient):
     assert b"No allergies recorded." in page
     assert b"No active problems recorded." in page
     assert b"No encounters recorded." in page
+    assert b"No vitals recorded." in page
 
 
 def test_chart_shows_allergies_problems_and_encounters(client, patient):
@@ -72,6 +74,26 @@ def test_chart_hides_resolved_conditions(client, patient):
 
     resolve_condition(add_condition(patient, "J10.1", "Influenza"))
     assert b"Influenza" not in client.get(f"/patients/{patient}").data
+
+
+def test_chart_shows_vitals_and_flags(client, patient, open_encounter):
+    record_vitals(open_encounter, systolic=150, diastolic=95, heart_rate=72, temperature_f=98.6)
+    page = client.get(f"/patients/{patient}").data
+    assert b"150/95" in page
+    assert b"98.6" in page
+    assert b"High blood pressure" in page
+
+
+def test_chart_without_vitals_says_so(client, patient, open_encounter):
+    assert b"No vitals recorded." in client.get(f"/patients/{patient}").data
+
+
+def test_chart_shows_dash_for_missing_vitals_not_none(client, patient, open_encounter):
+    """A vital that wasn't recorded is None in Python; the page must not print that word."""
+    record_vitals(open_encounter, heart_rate=72)
+    page = client.get(f"/patients/{patient}").data
+    assert b"None" not in page
+    assert "—".encode() in page
 
 
 def test_unknown_mrn_is_404(client):

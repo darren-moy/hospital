@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% macro local_time(utc) %}{% if utc %}<time datetime="{{ utc | utc_iso }}">{{ utc }} UTC</time>{% endif %}{% endmacro %}
 {% block title %}{{ patient.last_name }}, {{ patient.first_name }}{% endblock %}
+{% macro cell(value) %}{{ value if value is not none else "—" }}{% endmacro %}
 {% block content %}
 <h2>{{ patient.last_name }}, {{ patient.first_name }}</h2>
 <p>MRN {{ patient.mrn }} · DOB {{ patient.date_of_birth }} · Sex {{ patient.sex }}</p>
@@ -60,4 +61,34 @@
 {% else %}
 <p>No encounters recorded.</p>
 {% endif %}
+
+<h3>Vitals</h3>
+{% set visits = encounters | selectattr("vitals") | list %}
+{% if visits %}
+  {% for e in visits %}
+  <h4>{{ e.encounter_type | capitalize }}: {{ e.reason }}</h4>
+  <div class="table-wrap">
+  <table>
+    <tr>
+      <th>Recorded</th><th>BP</th><th>Heart rate</th><th>Temp (°F)</th>
+      <th>Breathing</th><th>SpO₂ (%)</th><th>Flags</th>
+    </tr>
+    {% for v in e.vitals %}
+    <tr>
+      <td>{{ local_time(v.recorded_at) }}</td>
+      <td>{% if v.systolic is not none %}{{ v.systolic }}/{{ v.diastolic }}{% else %}—{% endif %}</td>
+      <td>{{ cell(v.heart_rate) }}</td>
+      <td>{{ cell(v.temperature_f) }}</td>
+      <td>{{ cell(v.resp_rate) }}</td>
+      <td>{{ cell(v.spo2) }}</td>
+      <td>{% for flag in v.flags %}<span class="severe">{{ flag }}</span>{% if not loop.last %}, {% endif %}{% endfor %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  </div>
+  {% endfor %}
+{% else %}
+<p>No vitals recorded.</p>
+{% endif %}
+
 {% endblock %}

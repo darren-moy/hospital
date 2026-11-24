@@ -6,6 +6,7 @@ from allergies import list_allergies
 from conditions import list_conditions
 from encounters import list_encounters
 from patients import find_patient_by_mrn, search_by_last_name
+from vitals import list_vitals
 
 app = Flask(__name__)
 
@@ -34,12 +35,15 @@ def chart(mrn):
     patient = find_patient_by_mrn(mrn)
     if patient is None:
         abort(404)
+    encounters = list_encounters(mrn)
+    for encounter in encounters:
+        encounter["vitals"] = list_vitals(encounter["id"])
     return render_template(
         "chart.html",
         patient=patient,
         allergies=list_allergies(mrn),
         conditions=list_conditions(mrn),
-        encounters=list_encounters(mrn),
+        encounters=encounters,
     )
 
 
