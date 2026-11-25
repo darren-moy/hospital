@@ -5,15 +5,15 @@ from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
-import db
-from conditions import (
+from hospital import db
+from hospital.domain.conditions import (
     ICD10_PATTERN,
     MAX_DESCRIPTION_LENGTH,
     add_condition,
     list_conditions,
     resolve_condition,
 )
-from patients import register_patient
+from hospital.domain.patients import register_patient
 
 # Schema value, pinned independently of conditions.MAX_DESCRIPTION_LENGTH.
 SCHEMA_MAX_DESCRIPTION = 200

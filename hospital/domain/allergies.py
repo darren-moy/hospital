@@ -1,7 +1,7 @@
 import sqlite3
 
-from db import get_connection
-from patients import _clean_text, _get_patient_id
+from hospital.db import get_connection
+from hospital.domain.patients import _clean_text, _get_patient_id
 
 VALID_SEVERITIY = {"mild", "moderate", "severe"}
 MAX_SUBSTANCE_LENGTH = 100

@@ -2,7 +2,7 @@
 
 import pytest
 
-from vitals import abnormal_flags
+from hospital.domain.vitals import abnormal_flags
 
 NORMAL = {
     "systolic": 120,

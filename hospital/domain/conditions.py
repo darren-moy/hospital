@@ -2,8 +2,8 @@ import re
 import sqlite3
 from datetime import date
 
-from db import MAX_SQLITE_INT, get_connection
-from patients import _get_patient_id
+from hospital.db import MAX_SQLITE_INT, get_connection
+from hospital.domain.patients import _get_patient_id
 
 ICD10_PATTERN = re.compile(r"[A-Z][0-9][0-9A-Z](\.[0-9A-Z]{1,4})?")
 DATE_PATTERN = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")

@@ -1,7 +1,10 @@
 import sqlite3
 from pathlib import Path
 
-DB_PATH = "hospital.db"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# Anchored to the project folder, not the current directory, so running from elsewhere can't
+# silently create a second, empty database
+DB_PATH = str(PROJECT_ROOT / "hospital.db")
 SCHEMA_PATH = Path(__file__).parent / "schema.sql"
 MAX_SQLITE_INT = 2**63 - 1  # larger Python ints raise OverflowError when bound to a query
 

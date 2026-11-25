@@ -1,7 +1,7 @@
 import sqlite3
 
-from db import MAX_SQLITE_INT, get_connection
-from patients import _clean_text, _get_patient_id
+from hospital.db import MAX_SQLITE_INT, get_connection
+from hospital.domain.patients import _clean_text, _get_patient_id
 
 VALID_TYPES = {"outpatient", "emergency", "inpatient"}
 MAX_REASON_LENGTH = 200

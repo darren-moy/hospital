@@ -2,8 +2,8 @@
 
 import pytest
 
-from allergies import add_allergy, list_allergies, patients_without_allergies
-from patients import register_patient
+from hospital.domain.allergies import add_allergy, list_allergies, patients_without_allergies
+from hospital.domain.patients import register_patient
 
 
 def test_added_allergy_is_listed(patient):

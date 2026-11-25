@@ -9,11 +9,16 @@ import sqlite3
 
 import pytest
 
-from allergies import add_allergy, list_allergies
-from app import app, utc_iso
-from db import get_connection
-from encounters import close_encounter, list_encounters, open_encounters, start_encounter
-from patients import find_patient_by_mrn, register_patient, search_by_last_name
+from hospital.db import get_connection
+from hospital.domain.allergies import add_allergy, list_allergies
+from hospital.domain.encounters import (
+    close_encounter,
+    list_encounters,
+    open_encounters,
+    start_encounter,
+)
+from hospital.domain.patients import find_patient_by_mrn, register_patient, search_by_last_name
+from hospital.web.app import app, utc_iso
 
 # --- patients.py ---------------------------------------------------------------
 
@@ -169,6 +174,6 @@ def test_flask_debug_is_off_by_default():
     """Debug mode exposes a console that can run code, so only FLASK_DEBUG=1 may enable it."""
     import pathlib
 
-    source = pathlib.Path(__file__).parents[2].joinpath("app.py").read_text()
+    source = pathlib.Path(__file__).parents[2].joinpath("hospital", "web", "app.py").read_text()
     assert 'debug=os.environ.get("FLASK_DEBUG") == "1"' in source
     assert "debug=True" not in source

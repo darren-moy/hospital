@@ -1,11 +1,11 @@
 """Fill hospital.db with fictional demo patients. Safe to run more than once."""
 
-from allergies import add_allergy
-from conditions import add_condition, resolve_condition
-from db import init_db
-from encounters import close_encounter, start_encounter
-from patients import register_patient, search_by_last_name
-from vitals import record_vitals
+from hospital.db import init_db
+from hospital.domain.allergies import add_allergy
+from hospital.domain.conditions import add_condition, resolve_condition
+from hospital.domain.encounters import close_encounter, start_encounter
+from hospital.domain.patients import register_patient, search_by_last_name
+from hospital.domain.vitals import record_vitals
 
 
 def already_seeded(first_name, last_name, date_of_birth):

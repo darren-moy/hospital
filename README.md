@@ -53,15 +53,21 @@ On my Mac the default `python3` had an old SQLite and failed with `near "STRICT"
 Then create the database:
 
 ```bash
-python db.py
+python -m hospital.db
 ```
 
-Run everything from the repo root. The database path is relative, so running from somewhere else quietly creates a new empty `hospital.db` there.
+To fill it with a few fictional patients so there's something to look at:
+
+```bash
+python -m hospital.seed
+```
+
+Run these from the repo root, which is where `hospital.db` gets created.
 
 ## Running it
 
 ```bash
-python app.py
+python -m hospital.web.app
 ```
 
 Go to http://127.0.0.1:5000. Search a last name (2+ letters) and click an MRN to open the chart.
@@ -69,11 +75,11 @@ Go to http://127.0.0.1:5000. Search a last name (2+ letters) and click an MRN to
 The site is read-only right now. To add data, use the Python functions:
 
 ```python
-from patients import register_patient
-from allergies import add_allergy
-from encounters import start_encounter, close_encounter
-from vitals import record_vitals, list_vitals
-from conditions import add_condition
+from hospital.domain.patients import register_patient
+from hospital.domain.allergies import add_allergy
+from hospital.domain.encounters import start_encounter, close_encounter
+from hospital.domain.vitals import record_vitals, list_vitals
+from hospital.domain.conditions import add_condition
 
 mrn = register_patient("Ada", "Lovelace", "1815-12-10", "F")   # "100001"
 add_allergy(mrn, "Penicillin", "severe", reaction="Rash")
@@ -106,17 +112,17 @@ Run one group with `python -m pytest tests/unit`.
 ## Layout
 
 ```
-app.py          Flask routes
-db.py           connection + setup
-schema.sql      tables and constraints
-patients.py     allergies.py     encounters.py
-vitals.py       conditions.py
-templates/      Jinja pages
-tests/          pytest (tests/schema/ is generated)
+hospital/
+  db.py           connection + setup
+  schema.sql      tables and constraints
+  seed.py         fictional demo patients
+  domain/         patients, allergies, encounters, vitals, conditions
+  web/            Flask routes (app.py) and Jinja templates
+tests/            pytest: unit/, regression/, schema/ (generated)
 ```
 
 ## Known gaps / todo
 
 - Can't add or edit records from the website yet
 - No login
-- No migrations: if `schema.sql` changes, delete `hospital.db` and run `python db.py` again
+- No migrations: if `schema.sql` changes, delete `hospital.db` and run `python -m hospital.db` again

@@ -2,8 +2,13 @@
 
 import pytest
 
-from encounters import close_encounter, list_encounters, open_encounters, start_encounter
-from patients import register_patient
+from hospital.domain.encounters import (
+    close_encounter,
+    list_encounters,
+    open_encounters,
+    start_encounter,
+)
+from hospital.domain.patients import register_patient
 
 
 def test_start_returns_id_and_encounter_is_open(patient):

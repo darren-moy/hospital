@@ -1,7 +1,7 @@
 import re
 from datetime import date
 
-from db import get_connection
+from hospital.db import get_connection
 
 VALID_SEX = {"F", "M", "O", "U"}
 MAX_NAME_LENGTH = 50

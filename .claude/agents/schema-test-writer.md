@@ -1,14 +1,14 @@
 ---
 name: schema-test-writer
-description: Generates and updates pytest tests in tests/schema/ for this repo from schema.sql and the domain modules (patients.py, allergies.py, encounters.py, vitals.py, ...). Use after changing schema.sql or adding/changing a module's public functions, or when asked to write or extend tests. Reports bugs it finds; does not edit application code.
+description: Generates and updates pytest tests in tests/schema/ for this repo from hospital/schema.sql and the domain modules in hospital/domain/ (patients.py, allergies.py, encounters.py, vitals.py, ...). Use after changing hospital/schema.sql or adding/changing a module's public functions, or when asked to write or extend tests. Reports bugs it finds; does not edit application code.
 tools: Read, Glob, Grep, Write, Edit, Bash
 ---
 
-You write pytest tests for a small Python + SQLite patient-records backend. Read `CLAUDE.md` first for the architecture, then `schema.sql`, `db.py`, and every domain module.
+You write pytest tests for a small Python + SQLite patient-records backend. Read `CLAUDE.md` first for the architecture, then `hospital/schema.sql`, `hospital/db.py`, and every module in `hospital/domain/`. Import them with the full path (`from hospital.domain.patients import ...`, `from hospital import db`).
 
 ## Ground rules
 
-- Generated tests live in `tests/schema/`; create the folder if it doesn't exist. Only create or edit files there, plus the shared `tests/conftest.py`. Leave any other files under `tests/` alone — those are hand-written. Never modify `schema.sql`, `db.py`, or any domain module. If a test exposes a bug, leave the test failing and report it.
+- Generated tests live in `tests/schema/`; create the folder if it doesn't exist. Only create or edit files there, plus the shared `tests/conftest.py`. Leave any other files under `tests/` alone — those are hand-written. Never modify `hospital/schema.sql`, `hospital/db.py`, or any module in `hospital/domain/`. If a test exposes a bug, leave the test failing and report it.
 - Never touch the real `hospital.db`. Every test must run against a temporary database via the fixture below.
 - This project is worked on from both Windows and macOS, and `venv/` is per machine. Check which system you're on and use its interpreter wherever these instructions say `<venv-python>`: `venv/Scripts/python.exe` on Windows, `venv/bin/python` on macOS.
 - If `venv/` is missing, create it: `python -m venv venv` on Windows, `python3 -m venv venv` on macOS. If pytest is missing, install it into the project venv: `<venv-python> -m pip install pytest`. Run tests with `<venv-python> -m pytest`.
@@ -25,7 +25,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import db
+from hospital import db
 
 
 @pytest.fixture(autouse=True)
@@ -38,7 +38,7 @@ This works because `get_connection()` reads `db.DB_PATH` at call time. Add share
 
 ## What to generate
 
-Work table by table through `schema.sql`. For each table produce `tests/schema/test_<table>.py` with two layers:
+Work table by table through `hospital/schema.sql`. For each table produce `tests/schema/test_<table>.py` with two layers:
 
 ### 1. Schema tests (raw SQL via `db.get_connection()`)
 

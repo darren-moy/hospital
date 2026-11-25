@@ -4,11 +4,11 @@ from pathlib import Path
 
 import pytest
 
-import db
-import vitals
-from vitals import VITALS, abnormal_flags, list_vitals, record_vitals
+from hospital import db
+from hospital.domain import vitals
+from hospital.domain.vitals import VITALS, abnormal_flags, list_vitals, record_vitals
 
-SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schema.sql"
+SCHEMA_PATH = Path(__file__).resolve().parents[2] / "hospital" / "schema.sql"
 
 VITAL_COLUMNS = ["systolic", "diastolic", "heart_rate", "temperature_f", "resp_rate", "spo2"]
 INTEGER_VITALS = ["systolic", "diastolic", "heart_rate", "resp_rate", "spo2"]
@@ -589,8 +589,8 @@ def test_list_vitals_same_timestamp_id_desc_tiebreak(open_encounter):
 
 
 def test_list_vitals_only_returns_requested_encounter(patient, open_encounter):
-    from encounters import start_encounter
-    from patients import register_patient
+    from hospital.domain.encounters import start_encounter
+    from hospital.domain.patients import register_patient
 
     other_mrn = register_patient("Grace", "Hopper", "1906-12-09", "F")
     other = start_encounter(other_mrn, "emergency", "Fall")
@@ -600,7 +600,7 @@ def test_list_vitals_only_returns_requested_encounter(patient, open_encounter):
 
 
 def test_list_vitals_includes_closed_encounter_history(open_encounter):
-    from encounters import close_encounter
+    from hospital.domain.encounters import close_encounter
 
     vid = record_vitals(open_encounter, heart_rate=70)
     close_encounter(open_encounter)

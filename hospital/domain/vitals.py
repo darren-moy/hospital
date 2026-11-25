@@ -1,4 +1,4 @@
-from db import get_connection
+from hospital.db import get_connection
 
 # NOT REAL RANGES for demonstration purposes
 VITALS = {

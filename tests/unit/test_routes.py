@@ -2,11 +2,11 @@
 
 import pytest
 
-from allergies import add_allergy
-from app import app
-from conditions import add_condition
-from encounters import start_encounter
-from vitals import record_vitals
+from hospital.domain.allergies import add_allergy
+from hospital.domain.conditions import add_condition
+from hospital.domain.encounters import start_encounter
+from hospital.domain.vitals import record_vitals
+from hospital.web.app import app
 
 
 @pytest.fixture
@@ -70,7 +70,7 @@ def test_chart_shows_allergies_problems_and_encounters(client, patient):
 
 
 def test_chart_hides_resolved_conditions(client, patient):
-    from conditions import resolve_condition
+    from hospital.domain.conditions import resolve_condition
 
     resolve_condition(add_condition(patient, "J10.1", "Influenza"))
     assert b"Influenza" not in client.get(f"/patients/{patient}").data

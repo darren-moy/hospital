@@ -2,7 +2,7 @@
 
 import pytest
 
-from patients import find_patient_by_mrn, register_patient, search_by_last_name
+from hospital.domain.patients import find_patient_by_mrn, register_patient, search_by_last_name
 
 
 def test_first_mrn_is_100001():
