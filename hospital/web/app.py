@@ -35,6 +35,7 @@ def chart(mrn):
     patient = find_patient_by_mrn(mrn)
     if patient is None:
         abort(404)
+    show_resolved = request.args.get("resolved") == "1"
     encounters = list_encounters(mrn)
     for encounter in encounters:
         encounter["vitals"] = list_vitals(encounter["id"])
@@ -42,8 +43,9 @@ def chart(mrn):
         "chart.html",
         patient=patient,
         allergies=list_allergies(mrn),
-        conditions=list_conditions(mrn),
+        conditions=list_conditions(mrn, include_resolved=show_resolved),
         encounters=encounters,
+        show_resolved=show_resolved,
     )
 
 

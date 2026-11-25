@@ -24,23 +24,38 @@
 <p>No allergies recorded.</p>
 {% endif %}
 
-<h3>Active problems</h3>
+<h3>{{ "Problems" if show_resolved else "Active problems" }}</h3>
+<p>
+  {% if show_resolved %}
+  <a href="{{ url_for('chart', mrn=patient.mrn) }}">Hide resolved</a>
+  {% else %}
+  <a href="{{ url_for('chart', mrn=patient.mrn, resolved=1) }}">Show resolved</a>
+  {% endif %}
+</p>
 {% if conditions %}
 <div class="table-wrap">
 <table>
-  <tr><th>ICD-10</th><th>Description</th><th>Onset</th></tr>
-  {% for c in conditions %}
   <tr>
+    <th>ICD-10</th><th>Description</th><th>Onset</th>
+    {% if show_resolved %}<th>Status</th><th>Resolved</th>{% endif %}
+  </tr>
+  {% for c in conditions %}
+  <tr class="{{ 'resolved' if c.status == 'resolved' else '' }}">
     <td>{{ c.icd10_code }}</td>
     <td>{{ c.description }}</td>
     <td>{{ c.onset_date or "Unknown" }}</td>
+    {% if show_resolved %}
+    <td>{{ c.status }}</td>
+    <td>{{ c.resolved_date or "—" }}</td>
+    {% endif %}
   </tr>
   {% endfor %}
 </table>
 </div>
 {% else %}
-<p>No active problems recorded.</p>
+<p>{% if show_resolved %}No problems recorded.{% else %}No active problems recorded.{% endif %}</p>
 {% endif %}
+
 
 <h3>Encounters</h3>
 {% if encounters %}
