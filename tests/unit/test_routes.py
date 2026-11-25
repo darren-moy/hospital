@@ -3,7 +3,7 @@
 import pytest
 
 from hospital.domain.allergies import add_allergy
-from hospital.domain.conditions import add_condition
+from hospital.domain.conditions import add_condition, resolve_condition
 from hospital.domain.encounters import start_encounter
 from hospital.domain.vitals import record_vitals
 from hospital.web.app import app
@@ -70,10 +70,40 @@ def test_chart_shows_allergies_problems_and_encounters(client, patient):
 
 
 def test_chart_hides_resolved_conditions(client, patient):
-    from hospital.domain.conditions import resolve_condition
-
     resolve_condition(add_condition(patient, "J10.1", "Influenza"))
     assert b"Influenza" not in client.get(f"/patients/{patient}").data
+
+
+def test_chart_links_to_the_resolved_view(client, patient):
+    page = client.get(f"/patients/{patient}").data.decode()
+    assert "Show resolved" in page
+    assert "resolved=1" in page
+
+
+def test_resolved_view_shows_resolved_conditions(client, patient):
+    resolve_condition(add_condition(patient, "J11.1", "Influenza"))
+    page = client.get(f"/patients/{patient}?resolved=1").data.decode()
+    assert "Influenza" in page
+    assert "Hide resolved" in page
+
+
+def test_resolved_view_lists_active_before_resolved(client, patient):
+    resolve_condition(add_condition(patient, "J11.1", "Influenza"))
+    add_condition(patient, "I10", "Hypertension")
+    page = client.get(f"/patients/{patient}?resolved=1").data.decode()
+    assert page.index("Hypertension") < page.index("Influenza")
+
+
+@pytest.mark.parametrize("value", ["", "0", "true", "yes", "2"])
+def test_only_resolved_equals_1_turns_the_view_on(client, patient, value):
+    resolve_condition(add_condition(patient, "J11.1", "Influenza"))
+    page = client.get(f"/patients/{patient}", query_string={"resolved": value}).data.decode()
+    assert "Influenza" not in page
+
+
+def test_empty_resolved_view_says_no_problems(client, patient):
+    page = client.get(f"/patients/{patient}?resolved=1").data.decode()
+    assert "No problems recorded." in page
 
 
 def test_chart_shows_vitals_and_flags(client, patient, open_encounter):
